@@ -400,18 +400,18 @@ def reactivation_bias(y_pred, behavior, paths, day, days):
                                       np.sum(y_pred_rate[start + (j * step):start + ((j + 1) * step)]))
             x_label.append((step/behavior['framerate']/60/60 * idx)[0][0])
             idx = idx + 1
-    sns.set(font_scale=1)
-    sns.set_style("whitegrid", {'axes.grid': False})
-    sns.set_style("ticks")
-    fig = plt.figure(figsize=(8, 5))
+    # sns.set(font_scale=1)
+    # sns.set_style("whitegrid", {'axes.grid': False})
+    # sns.set_style("ticks")
+    # fig = plt.figure(figsize=(8, 5))
     y_pred_binned_norm = np.nan_to_num(y_pred_binned_norm, copy=True, nan=0.0, posinf=None, neginf=None)
-    plt.plot(x_label, y_pred_binned_norm, '-ok')
-    plt.ylabel('Mean reactivation bias')
-    plt.xlabel('Time from first cue presentation (hours)')
-    sns.despine()
-    plt.savefig(paths['save_path'] + 'plots/' + paths['mouse'] + '_' + paths['date'] + '_' +
-                'mean_reactivation_bias_binned.png', bbox_inches='tight', dpi=150)
-    plt.close(fig)
+    # plt.plot(x_label, y_pred_binned_norm, '-ok')
+    # plt.ylabel('Mean reactivation bias')
+    # plt.xlabel('Time from first cue presentation (hours)')
+    # sns.despine()
+    # plt.savefig(paths['save_path'] + 'plots/' + paths['mouse'] + '_' + paths['date'] + '_' +
+    #             'mean_reactivation_bias_binned.png', bbox_inches='tight', dpi=150)
+    # plt.close(fig)
 
     days_path = paths['base_path'] + paths['mouse'] + '/data_across_days/'
     if days:
@@ -1089,18 +1089,18 @@ def activity_control(norm_deconvolved, behavior, paths, day, days):
             iti_activity[i, :] = temp_iti_activity
     iti_activity = np.nanmean(iti_activity, axis=0)
 
-    sns.set(font_scale=1.5)
-    sns.set_style("whitegrid", {'axes.grid': False})
-    sns.set_style("ticks")
-    plt.figure(figsize=(8, 5))
-    plt.plot(range(0, len(iti_activity)), iti_activity)
-    plt.ylabel('Activity')
-    plt.xlabel('Time (frame)')
-    sns.despine()
-    plt.ylim((0, .08))
-    plt.savefig(paths['save_path'] + 'plots/' + paths['mouse'] + '_' + paths['date'] + '_' +
-                'iti_activity.png', bbox_inches='tight', dpi=150)
-    plt.close()
+    # sns.set(font_scale=1.5)
+    # sns.set_style("whitegrid", {'axes.grid': False})
+    # sns.set_style("ticks")
+    # plt.figure(figsize=(8, 5))
+    # plt.plot(range(0, len(iti_activity)), iti_activity)
+    # plt.ylabel('Activity')
+    # plt.xlabel('Time (frame)')
+    # sns.despine()
+    # plt.ylim((0, .08))
+    # plt.savefig(paths['save_path'] + 'plots/' + paths['mouse'] + '_' + paths['date'] + '_' +
+    #             'iti_activity.png', bbox_inches='tight', dpi=150)
+    # plt.close()
 
     days_path = paths['base_path'] + paths['mouse'] + '/data_across_days/'
     if days:
@@ -2165,7 +2165,6 @@ def reactivation_cue_vector(norm_deconvolved, idx, y_pred, behavior, paths, day,
                 'reactivation_cue_vector.pdf', bbox_inches='tight', dpi=200, transparent=True)
     plt.show()
     #plt.close()
-    ggg
 
     days_path = paths['base_path'] + paths['mouse'] + '/data_across_days/'
     if days:

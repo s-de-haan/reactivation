@@ -21,8 +21,8 @@ def create_folders(mouse, date):
     :param date: date
     :return: folders
     """
-    base_path = 'D:/2p_data/scan/'
-    save_path = base_path + mouse + '/' + date + '_' + mouse + '/processed_data/'
+    base_path = '/Users/sander/PhD/reactivation/andermann_data/'
+    save_path = base_path + mouse + '/' + date + '_' + 'behavior_data/'
     if not path.exists(save_path + 'plots'):
         makedirs(save_path + 'plots')
     if not path.exists(save_path + 'movies'):
@@ -44,7 +44,7 @@ def load_data(paths):
     :param paths: path to data
     :return: neural and behavioral data and path to it
     """
-    session_data = loadmat(paths['save_path'] + 'saved_data/behavior_file.mat')
+    session_data = loadmat(paths['save_path'] + 'behavior_file.mat')
     return session_data
 
 
@@ -70,8 +70,7 @@ def process_behavior(session_data, paths):
     frames_before = int(framerate * 2)
     frames_after = int(framerate * 8) + 1
     iti = int(session_data['ITI'])
-    ops_path = paths['base_path'] + paths['mouse'] + '/' + paths['date'] + '_' + paths['mouse'] + \
-                    '/suite2p_plane_1/suite2p/plane0/'
+    ops_path = paths['base_path'] + paths['mouse'] + '/' + paths['date'] + '_plane_1/'
     ops = np.load(ops_path + 'ops.npy', allow_pickle=True).item()
     y_off = np.diff(ops['yoff']) * np.diff(ops['yoff'])
     x_off = np.diff(ops['xoff']) * np.diff(ops['xoff'])
@@ -132,15 +131,12 @@ def cell_masks(paths, save):
     :return:
     """
     if path.isfile(paths['save_path'] + 'saved_data/overlap_plane_2.mat') == 0 or save == 1:
-        data_path_1 = paths['base_path'] + paths['mouse'] + '/' + paths['date'] + '_' + paths['mouse'] + \
-                      '/suite2p_plane_1/suite2p/plane0/'
+        data_path_1 = paths['base_path'] + paths['mouse'] + '/' + paths['date'] + '_plane_1/'
         make_cell_masks(data_path_1, paths, 1)
-        data_path_2 = paths['base_path'] + paths['mouse'] + '/' + paths['date'] + '_' + paths['mouse'] + \
-                      '/suite2p_plane_2/suite2p/plane0/'
+        data_path_2 = paths['base_path'] + paths['mouse'] + '/' + paths['date'] + '_plane_2/'
         if os.path.isdir(data_path_2):
             make_cell_masks(data_path_2, paths, 2)
-        data_path_3 = paths['base_path'] + paths['mouse'] + '/' + paths['date'] + '_' + paths['mouse'] + \
-                      '/suite2p_plane_3/suite2p/plane0/'
+        data_path_3 = paths['base_path'] + paths['mouse'] + '/' + paths['date'] + '_plane_3/'
         if os.path.isdir(data_path_3):
             make_cell_masks(data_path_3, paths, 3)
 
@@ -155,8 +151,8 @@ def make_cell_masks(data_path, paths, plane):
     """
     stat = np.load(data_path + 'stat.npy', allow_pickle=True)
     accepted_cells = np.load(data_path + 'iscell.npy')[:, 0]
-    fluorescence = np.load(data_path + 'F.npy').sum(axis=1)
-    accepted_cells[fluorescence == 0] = 0
+    # fluorescence = np.load(data_path + 'F.npy').sum(axis=1)
+    # accepted_cells[fluorescence == 0] = 0
     accepted_cells = accepted_cells == 1
     stat = stat[accepted_cells]
     ops = np.load(data_path + 'ops.npy', allow_pickle=True).item()
@@ -179,11 +175,10 @@ def process_activity(paths, activity_type, planes, to_delete_save):
     """
     activity = []
     for plane in range(1, planes+1):
-        plane_path = paths['base_path'] + paths['mouse'] + '/' + paths['date'] + '_' + paths['mouse'] + \
-                  '/suite2p_plane_' + str(plane) + '/suite2p/plane0/'
+        plane_path = paths['base_path'] + paths['mouse'] + '/' + paths['date'] + '_plane_' + str(plane) + '/'
         accepted_cells = np.load(plane_path + 'iscell.npy')[:, 0]
-        fluorescence = np.load(plane_path + 'F.npy').sum(axis=1)
-        accepted_cells[fluorescence == 0] = 0
+        # fluorescence = np.load(plane_path + 'F.npy').sum(axis=1)
+        # accepted_cells[fluorescence == 0] = 0
         accepted_cells = accepted_cells == 1
         all_activity = np.load(plane_path + activity_type + '.npy')
         if activity_type == 'F':
@@ -192,8 +187,8 @@ def process_activity(paths, activity_type, planes, to_delete_save):
             activity = all_activity[accepted_cells, :]
         else:
             activity_plane = all_activity[accepted_cells, :]
-            to_delete = cells_to_delete(paths, plane, plane_path, to_delete_save)
-            activity_plane = activity_plane[to_delete == 1, :]
+            # to_delete = cells_to_delete(paths, plane, plane_path, to_delete_save)
+            # activity_plane = activity_plane[to_delete == 1, :]
             activity = np.concatenate((activity, activity_plane))
     return activity
 
@@ -310,17 +305,17 @@ def difference_gaussian_filter(deconvolved_vec, fwhm, behavior, paths, save):
         deconvolved_vector_filter_2 = filtered_s0 - filtered_s2
         deconvolved_vector_filter_3 = filtered_s0 - filtered_s3
 
-        deconvolved_vector_filter_min = pd.concat(
+        deconvolved_vector_filter_min = np.concatenate(
             [deconvolved_vector_filter_1, deconvolved_vector_filter_2,
-             deconvolved_vector_filter_3]).min(level=0)
-
+             deconvolved_vector_filter_3]).min(axis=0) # UPDATED from level=0 -> axis=0!
+        
         deconvolved_vector_filter_min_final = np.array(deconvolved_vec)
         deconvolved_vector_filter_min = np.array(deconvolved_vector_filter_min)
 
         frame = 0
         for i in range(0, len(times_to_use)):
             if times_to_use[i] == 1:
-                deconvolved_vector_filter_min_final[:, i] = deconvolved_vector_filter_min[:, frame]
+                deconvolved_vector_filter_min_final[:, i] = deconvolved_vector_filter_min[frame] # UPDATED from [:,frame] to [frame]
                 frame = frame + 1
 
         np.save(paths['save_path'] + 'saved_data/deconvolved_filtered', deconvolved_vector_filter_min_final)
@@ -435,7 +430,8 @@ def get_index(behavior, mean_cs_1_responses_df, mean_cs_2_responses_df, cs_1_pos
         idx = {'cs_1': cs_1_idx, 'cs_2': cs_2_idx, 'cs_1_df': cs_1_idx_df, 'cs_2_df': cs_2_idx_df, 'both': both_idx,
                'all': both_sig}
         if save == 1:
-            np.save(paths['save_path'] + 'saved_data/idx', idx)
+            pass
+            # np.save(paths['save_path'] + 'saved_data/idx', idx)
         return idx
 
 
