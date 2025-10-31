@@ -190,6 +190,7 @@ def process_activity(paths, activity_type, planes, to_delete_save):
             # to_delete = cells_to_delete(paths, plane, plane_path, to_delete_save)
             # activity_plane = activity_plane[to_delete == 1, :]
             activity = np.concatenate((activity, activity_plane))
+            
     return activity
 
 
